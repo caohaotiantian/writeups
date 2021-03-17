@@ -1,0 +1,491 @@
+#+title: who-wants-to-be-king 靶机
+#+author: 曹昊天
+#+email: caohaotiantian@qq.com
+* 靶机信息
+** 下载链接
+   https://download.vulnhub.com/whowantstobeking/whowantstobeking.ova
+** 靶机介绍
+*** 靶机名称
+    Who Wants To Be King: 1
+*** 发布日期
+    2020 年 12 月 1 日
+*** 作者
+    [[https://www.vulnhub.com/entry/who-wants-to-be-king-1,610/][Bjorn]]
+*** 系列
+    [[https://www.vulnhub.com/series/who-wants-to-be-king,410/][Who Wants To Be King]]
+*** 描述
+    Google Is Your Friend
+
+    Difficulty: Begginer
+
+    "Remember using 'strings'"
+
+    Twitter: @ArmBjorn
+
+    Work in Virtualbox.
+
+    Get root permissions
+* WRITEUP
+** 信息收集
+   靶机所在网段为 192.168.56.1/24
+
+   nmap 信息收集
+
+   #+begin_src bash
+     nmap --open 192.168.56.1/24
+   #+end_src
+
+   #+RESULTS:
+   | Starting | Nmap   | 7.91    | (         | https://nmap.org | )  | at    | 2021-03-17 |   23:01 | CST |      |         |
+   | Nmap     | scan   | report  | for       | 192.168.56.101   |    |       |            |         |     |      |         |
+   | Host     | is     | up      | (0.00038s | latency).        |    |       |            |         |     |      |         |
+   | Not      | shown: | 998     | closed    | ports            |    |       |            |         |     |      |         |
+   | PORT     | STATE  | SERVICE |           |                  |    |       |            |         |     |      |         |
+   | 22/tcp   | open   | ssh     |           |                  |    |       |            |         |     |      |         |
+   | 80/tcp   | open   | http    |           |                  |    |       |            |         |     |      |         |
+   |          |        |         |           |                  |    |       |            |         |     |      |         |
+   | Nmap     | done:  | 256     | IP        | addresses        | (2 | hosts |        up) | scanned | in  | 2.49 | seconds |
+** 访问网页
+   发现开放端口有 http 和 ssh，我们先通过浏览器访问 192.168.56.101:80
+
+   #+caption: 访问网页
+   [[file:./img/who_wants_to_be_king_1_1.png]]
+
+   发现有文件可以下载，下载之后在终端当中查看信息
+
+   #+begin_src bash
+     strings ~/Downloads/skeylogger
+   #+end_src
+
+   #+RESULTS:
+   | /lib64/ld-linux-x86-64.so.2                     |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | exit                                            |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | fopen                                           |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | daemon                                          |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | popen                                           |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | strdup                                          |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | __assert_fail                                   |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | printf                                          |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | fgets                                           |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | __errno_location                                |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | read                                            |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | fputs                                           |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | fclose                                          |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | strcat                                          |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | optarg                                          |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | getopt_long                                     |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | pclose                                          |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | geteuid                                         |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | __cxa_finalize                                  |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | setbuf                                          |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | strerror                                        |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | __libc_start_main                               |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | free                                            |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | libc.so.6                                       |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | GLIBC_2.2.5                                     |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | _ITM_deregisterTMCloneTable                     |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | __gmon_start__                                  |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | _ITM_registerTMCloneTable                       |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | u/UH                                            |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | /dev/inp                                        |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | []A\A]A^A_                                      |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | Must                                            | run        | as         | root           |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | skeylogger.c                                    |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | kbd_fd                                          | >          | 0          |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | Could                                           | not        | open       | log            | file                    |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | shift_pressed                                   | >=         | 0          | &&             | shift_pressed           | <=          | 2                            |                     |        |   |      |     |             |   |    |      |      |
+   | main                                            |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | <ESC>                                           |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | <Backspace>                                     |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | <Tab>                                           |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | <Enter>                                         |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | <LCtrl>                                         |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | <LShift>                                        |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | <RShift>                                        |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | <KP*>                                           |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | <LAlt>                                          |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | <CapsLock>                                      |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | <F1>                                            |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | <F2>                                            |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | <F3>                                            |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | <F4>                                            |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | <F5>                                            |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | <F6>                                            |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | <F7>                                            |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | <F8>                                            |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | <F9>                                            |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | <F10>                                           |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | <NumLock>                                       |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | <ScrollLock>                                    |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | <KP7>                                           |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | <KP8>                                           |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | <KP9>                                           |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | <KP->                                           |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | <KP4>                                           |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | <KP5>                                           |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | <KP6>                                           |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | <KP+>                                           |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | <KP1>                                           |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | <KP2>                                           |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | <KP3>                                           |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | <KP0>                                           |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | <KP.>                                           |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | <F11>                                           |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | <F12>                                           |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | <KPEnter>                                       |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | <RCtrl>                                         |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | <KP/>                                           |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | <SysRq>                                         |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | <RAlt>                                          |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | <Home>                                          |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | <Up>                                            |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | <PageUp>                                        |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | <Left>                                          |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | <Right>                                         |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | <End>                                           |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | <Down>                                          |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | <PageDown>                                      |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | <Insert>                                        |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | <Delete>                                        |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | Unknown                                         | key:       | %u         |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | hvl:d:                                          |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | help                                            |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | version                                         |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | logfile                                         |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | device                                          |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | Could                                           | not        | determine  | keyboard       | device                  | file        |                              |                     |        |   |      |     |             |   |    |      |      |
+   | ZHJhY2FyeXMK                                    |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | Usage:                                          | skeylogger | [OPTION]   |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | Logs                                            | pressed    | keys       |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | -h,                                             | --help     |            | Displays       | this                    | help        | message                      |                     |        |   |      |     |             |   |    |      |      |
+   | -v,                                             | --version  |            | Displays       | version                 | information |                              |                     |        |   |      |     |             |   |    |      |      |
+   | -l,                                             | --logfile  |            | Path           | to                      | the         | logfile                      |                     |        |   |      |     |             |   |    |      |      |
+   | -d,                                             | --device   |            | Path           | to                      | device      | file                         | (/dev/input/eventX) |        |   |      |     |             |   |    |      |      |
+   | Simple                                          | Key        | Logger     | version        | 0.0.1                   |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | grep                                            | -E         | 'Handlers  | EV'            | /proc/bus/input/devices |             | grep                         | -B1                 | 120013 |   | grep | -Eo | event[0-9]+ |   | tr | '\n' | '\0' |
+   | ;*3$"                                           |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | GCC:                                            | (Debian    | 10.2.0-16) | 10.2.0         |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   |                                                 | val        |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | /usr/lib/gcc/x86_64-linux-gnu/10/include        |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | /usr/x86_64-linux-gnu/include/bits              |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | /usr/x86_64-linux-gnu/include/bits/types        |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | /usr/x86_64-linux-gnu/include/asm-generic       |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | /usr/x86_64-linux-gnu/include/linux             |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | skeylogger.c                                    |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | stddef.h                                        |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | types.h                                         |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | struct_FILE.h                                   |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | FILE.h                                          |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | struct_timeval.h                                |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | stdint-uintn.h                                  |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | int-ll64.h                                      |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | input.h                                         |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | config.h                                        |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | /usr/x86_64-linux-gnu/include/bits              |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | key_util.c                                      |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | types.h                                         |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | stdint-uintn.h                                  |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | /usr/x86_64-linux-gnu/include/bits              |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | /usr/lib/gcc/x86_64-linux-gnu/10/include        |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | /usr/x86_64-linux-gnu/include/bits/types        |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | options.c                                       |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | getopt_ext.h                                    |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | stddef.h                                        |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | types.h                                         |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | struct_FILE.h                                   |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | FILE.h                                          |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | config.h                                        |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | getopt_core.h                                   |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | config.c                                        |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | config.h                                        |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | deviceFile                                      |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | _old_offset                                     |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | tv_sec                                          |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | _IO_save_end                                    |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | short                                           | int        |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | size_t                                          |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | _IO_lock_t                                      |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | __s32                                           |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | __PRETTY_FUNCTION__                             |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | rootCheck                                       |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | _IO_write_ptr                                   |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | main                                            |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | _IO_buf_base                                    |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | _markers                                        |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | config                                          |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | _freeres_buf                                    |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | /home/sunita/Descargas/simple-key-logger-master |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | argc                                            |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | long                                            | long       | int        |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | input_event                                     |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | _lock                                           |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | _cur_column                                     |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | __uint8_t                                       |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | Config                                          |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | argv                                            |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | name                                            |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | _IO_FILE                                        |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | unsigned                                        | char       |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | kbd_fd                                          |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | GNU                                             | C17        | 10.2.0     | -mtune=generic | -march=x86-64           | -g          | -fasynchronous-unwind-tables |                     |        |   |      |     |             |   |    |      |      |
+   | long                                            | long       | unsigned   | int            |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | type                                            |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | _IO_marker                                      |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | _shortbuf                                       |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | _IO_read_end                                    |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | code                                            |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | _IO_write_base                                  |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | _unused2                                        |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | _IO_read_ptr                                    |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | _IO_buf_end                                     |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | _freeres_list                                   |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | __off64_t                                       |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | openKeyboardDeviceFile                          |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | __pad5                                          |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | skeylogger.c                                    |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | short                                           | unsigned   | int        |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | __u16                                           |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | _IO_write_end                                   |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | __time_t                                        |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | shift_pressed                                   |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | __off_t                                         |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | _chain                                          |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | timeval                                         |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | _IO_wide_data                                   |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | tv_usec                                         |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | _IO_backup_base                                 |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | _flags2                                         |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | _mode                                           |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | _IO_read_base                                   |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | _vtable_offset                                  |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | time                                            |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | _IO_save_base                                   |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | _fileno                                         |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | __suseconds_t                                   |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | value                                           |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | _flags                                          |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | logFile                                         |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | _IO_codecvt                                     |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | logfile                                         |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | isShift                                         |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | getKeyText                                      |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | key_util.c                                      |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | __uint16_t                                      |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | _Bool                                           |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | shift_key_names                                 |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | long_opts                                       |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | getKeyboardDeviceFileName                       |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | pipe                                            |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | temp                                            |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | command                                         |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | printHelp                                       |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | optarg                                          |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | options.c                                       |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | short_opts                                      |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | option                                          |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | flag                                            |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | printVersion                                    |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | index                                           |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | parseOptions                                    |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | has_arg                                         |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | result                                          |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | config.c                                        |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | Config_cleanup                                  |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | crtstuff.c                                      |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | deregister_tm_clones                            |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | __do_global_dtors_aux                           |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | completed.0                                     |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | __do_global_dtors_aux_fini_array_entry          |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | frame_dummy                                     |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | __frame_dummy_init_array_entry                  |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | skeylogger.c                                    |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | rootCheck                                       |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | openKeyboardDeviceFile                          |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | __PRETTY_FUNCTION__.0                           |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | key_util.c                                      |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | shift_key_names                                 |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | options.c                                       |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | short_opts                                      |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | long_opts                                       |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | getKeyboardDeviceFileName                       |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | command.0                                       |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | printHelp                                       |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | printVersion                                    |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | config.c                                        |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | __FRAME_END__                                   |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | __init_array_end                                |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | _DYNAMIC                                        |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | __init_array_start                              |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | __GNU_EH_FRAME_HDR                              |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | _GLOBAL_OFFSET_TABLE_                           |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | __libc_csu_fini                                 |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | isShift                                         |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | free@@GLIBC_2.2.5                               |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | __errno_location@@GLIBC_2.2.5                   |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | _ITM_deregisterTMCloneTable                     |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | _edata                                          |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | fclose@@GLIBC_2.2.5                             |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | getopt_long@@GLIBC_2.2.5                        |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | setbuf@@GLIBC_2.2.5                             |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | printf@@GLIBC_2.2.5                             |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | pclose@@GLIBC_2.2.5                             |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | Config_cleanup                                  |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | __assert_fail@@GLIBC_2.2.5                      |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | fputs@@GLIBC_2.2.5                              |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | getKeyText                                      |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | geteuid@@GLIBC_2.2.5                            |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | read@@GLIBC_2.2.5                               |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | __libc_start_main@@GLIBC_2.2.5                  |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | fgets@@GLIBC_2.2.5                              |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | __data_start                                    |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | optarg@@GLIBC_2.2.5                             |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | __gmon_start__                                  |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | __dso_handle                                    |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | _IO_stdin_used                                  |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | __libc_csu_init                                 |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | parseOptions                                    |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | daemon@@GLIBC_2.2.5                             |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | __bss_start                                     |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | main                                            |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | popen@@GLIBC_2.2.5                              |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | fopen@@GLIBC_2.2.5                              |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | strcat@@GLIBC_2.2.5                             |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | exit@@GLIBC_2.2.5                               |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | __TMC_END__                                     |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | _ITM_registerTMCloneTable                       |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | strdup@@GLIBC_2.2.5                             |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | strerror@@GLIBC_2.2.5                           |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | __cxa_finalize@@GLIBC_2.2.5                     |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | .symtab                                         |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | .strtab                                         |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | .shstrtab                                       |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | .interp                                         |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | .note.gnu.build-id                              |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | .note.ABI-tag                                   |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | .gnu.hash                                       |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | .dynsym                                         |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | .dynstr                                         |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | .gnu.version                                    |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | .gnu.version_r                                  |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | .rela.dyn                                       |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | .rela.plt                                       |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | .init                                           |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | .plt.got                                        |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | .text                                           |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | .fini                                           |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | .rodata                                         |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | .eh_frame_hdr                                   |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | .eh_frame                                       |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | .init_array                                     |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | .fini_array                                     |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | .dynamic                                        |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | .got.plt                                        |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | .data                                           |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | .bss                                            |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | .comment                                        |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | .debug_aranges                                  |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | .debug_info                                     |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | .debug_abbrev                                   |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | .debug_line                                     |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+   | .debug_str                                      |            |            |                |                         |             |                              |                     |        |   |      |     |             |   |    |      |      |
+
+   在 Usage 那一行的上面发现一段奇怪的字符 =ZHJhY2FyeXMK=
+   
+   尝试使用 base64 解码，可得结果如下
+
+   #+begin_src bash
+     echo ZHJhY2FyeXMK | base64 --decode
+   #+end_src
+
+   #+RESULTS:
+   : dracarys
+** 连接 SSH
+   密码为 dracarys
+   
+   #+begin_src bash
+     ssh deanerys@192.168.56.101
+   #+end_src
+
+   连接后使用 ~ls~ 查看当前目录下的文件，发现一个名为 secret 的文件
+
+   查看文件内容可得
+   
+   #+begin_src bash
+     cat secret t
+   #+end_src
+
+   #+RESULTS:
+   |           |     |
+   | find home | pls |
+
+
+   查看 deanerys 命名相关的文件
+
+   #+begin_src bash
+     find / -name "daenerys.*" 2> /dev/null l
+   #+end_src
+
+   找到如下文件路径
+   
+   #+begin_quote
+   /home/daenerys/.local/share/daenerys.zip
+   #+end_quote
+   
+   解压之后可以看到如下文件
+   
+   #+begin_quote
+   /home/daenerys/.local/share/djkdsnkjdsn
+   #+end_quote
+   
+   查看该文件的内容
+
+   #+begin_src bash
+     cat djkdsnkjdsn
+   #+end_src
+
+   #+RESULTS:
+   : /usr/share/sounds/note.txt
+
+   查看该文件的内容
+
+   #+begin_src bash
+     cat /usr/share/sounds/note.txt 
+   #+end_src
+
+   #+RESULTS:
+   : I'm khal.....
+
+   通过搜索引擎查询可得权力的游戏里面的人物 =Khal Drogo=
+** 切换至 root 用户
+   使用密码 =khaldrogo= 切换至 root 用户
+
+   进入到 =~= 目录，使用 ~ls~ 查看当前目录下的文件
+
+   可以看到 nice.txt 文件
+   
+   查看文件内容
+
+   #+begin_src bash
+     cat nice.txt
+   #+end_src
+
+   #+RESULTS:
+   | ¡Congratulation!                                             |      |   |      |      |
+   |                                                              |      |   |      |      |
+   |                                                              |      |   |      |      |
+   | You                                                          | have | a | good | day! |
+   |                                                              |      |   |      |      |
+   |                                                              |      |   |      |      |
+   |                                                              |      |   |      |      |
+   | aHR0cHM6Ly93d3cueW91dHViZS5jb20vd2F0Y2g/dj1nTjhZRjBZZmJFawo= |      |   |      |      |
+** 小彩蛋
+   找到 flag，发现代码，尝试使用 base64 解码
+
+   #+begin_src bash
+     echo aHR0cHM6Ly93d3cueW91dHViZS5jb20vd2F0Y2g/dj1nTjhZRjBZZmJFawo= | base64 --decode
+   #+end_src
+
+   #+RESULTS:
+   : https://www.youtube.com/watch?v=gN8YF0YfbEk
+
+   发现是个视频
